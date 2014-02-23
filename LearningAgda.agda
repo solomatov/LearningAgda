@@ -68,6 +68,9 @@ ex-elim A P M f (ex a pa) = f a pa
 cong : (A : Set) → (P : A → Set) → (a b : A) → (I A a b) → P a → P b
 cong A P a b eq Pa = J A a b (λ x y r → P y ) eq Pa
 
+cong' : (A : Set) → (P : A → Set) → (a b : A) → (I A a b) → P a → P b
+cong' A P a .a (refl .a) Pa = Pa
+
 -- Excercise 1.2 (eq reflexivity)
 I-refl : (A : Set) → (a : A) → I A a a
 I-refl A a = refl a
@@ -76,15 +79,26 @@ I-refl A a = refl a
 I-symm : (A : Set) → (a b : A) → (I A a b) → (I A b a)
 I-symm A a b r = J A a b (λ x y r → I A y x) r (refl a)
 
+I-symm' : (A : Set) → (a b : A) → (I A a b) → (I A b a)
+I-symm' A a .a (refl .a) = refl a
+
 -- Excercise 1.4 (eq transitivity)
 I-trans : (A : Set) → (a b c : A) → (I A a b) → (I A b c) → (I A a c)
 I-trans A a b c a=b b=c = J A b a (λ x y r → I A y c) (I-symm A a b a=b) b=c
+
+I-trans' : (A : Set) → (a b c : A) → (I A a b) → (I A b c) → (I A a c)
+I-trans' A a .a .a (refl .a) (refl .a) = refl a
 
 -- Part 2. Equality usages
 
 -- Excercise 2.1
 bool-true-or-false : (b : Bool) → (I Bool b true) or (I Bool b false)
 bool-true-or-false = bool-elim (λ b → (I Bool b true) or (I Bool b false)) (inl (refl true)) ((inr (refl false)))
+
+bool-true-or-false' : (b : Bool) → (I Bool b true) or (I Bool b false)
+bool-true-or-false' true = inl (refl true)
+bool-true-or-false' false = inr (refl false)
+
 
 -- Excercise 2.2
 nat-zero-or-succ : (n : Nat) → (I Nat n zero) or (Exists Nat (λ m → I Nat n (suc m)))
@@ -101,6 +115,15 @@ nat-zero-or-succ = nat-elim
      )) 
      H)
 
+nat-zero-or-succ' : (n : Nat) → (I Nat n zero) or (Exists Nat (λ m → I Nat n (suc m)))
+nat-zero-or-succ' zero = inl (refl zero)
+nat-zero-or-succ' (suc n) = inr (ex n (refl (suc n)))
+
 -- Excercise 2.3 
 minus-one : (n : Nat) → not (I Nat zero n) → Nat
 minus-one = (nat-elim (λ n → not (I Nat zero n) → Nat) (λ nonZero → abort Nat (nonZero (refl zero))) (λ n _ _ → n))
+
+minus-one' : (n : Nat) → not (I Nat zero n) → Nat
+minus-one' zero notZero with notZero (refl zero)
+... | ()
+minus-one' (suc n) notZero = n
