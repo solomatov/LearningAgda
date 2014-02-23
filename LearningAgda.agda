@@ -25,6 +25,17 @@ J : (A : Set) → (a b : A) →
     (M a b p)
 J A .a .a C (refl a) c = c
 
+data True : Set where
+  tt : True
+
+data False : Set where
+  
+abort : (M : Set) → False → M
+abort M ()
+
+not : (A : Set) → Set
+not A = (A → False)
+
 data _and_ (A B : Set) : Set where
   pair : A → B → A and B
 
@@ -89,3 +100,7 @@ nat-zero-or-succ = nat-elim
         exNat  
      )) 
      H)
+
+-- Excercise 2.3 
+minus-one : (n : Nat) → not (I Nat zero n) → Nat
+minus-one = (nat-elim (λ n → not (I Nat zero n) → Nat) (λ nonZero → abort Nat (nonZero (refl zero))) (λ n _ _ → n))
